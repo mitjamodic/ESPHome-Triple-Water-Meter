@@ -1,0 +1,550 @@
+substitutions:
+  name: "watermeter"
+  friendly_name: "Water meter"
+
+esphome:
+  name: ${name}
+  on_boot:
+    priority: -10  # -100 To happen before the announcement of the statuses
+    then:
+      - if:
+          condition:
+            switch.is_on: enable_edit_mode
+          then:
+            - logger.log: "Edit mode enabled – totals can be set from UI."
+      - script.execute: publish_states_S1
+      - script.execute: publish_states_S2
+      - script.execute: publish_states_S3
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: arduino
+
+logger:
+  level: INFO
+
+ethernet:
+  type: W5500
+  cs_pin: GPIO14
+  mosi_pin: GPIO11
+  miso_pin: GPIO12
+  clk_pin: GPIO13
+  interrupt_pin: GPIO10
+  reset_pin: GPIO9
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+  - platform: web_server
+
+web_server:
+  port: 80
+
+# GLOBALS - you can change initial values ​​if you want
+globals:
+  # S1
+  - id: pulses_S1
+    type: float
+    restore_value: yes
+  - id: daily_S1
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: weekly_S1
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: monthly_S1
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: yearly_S1
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: event_qty_S1
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: last_event_qty_S1
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: event_counter_S1
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: current_event_qty_S1
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # S2
+  - id: pulses_S2
+    type: float
+    restore_value: yes
+  - id: daily_S2
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: weekly_S2
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: monthly_S2
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: yearly_S2
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: event_qty_S2
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: last_event_qty_S2
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: event_counter_S2
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: current_event_qty_S2
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # S3
+  - id: pulses_S3
+    type: float
+    restore_value: yes
+  - id: daily_S3
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: weekly_S3
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: monthly_S3
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: yearly_S3
+    type: int
+    restore_value: yes
+    initial_value: '0'
+  - id: event_qty_S3
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: last_event_qty_S3
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: event_counter_S3
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: current_event_qty_S3
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+# SCRIPTS FOR RESET
+script:
+  - id: publish_states_S1
+    then:
+      - lambda: |-
+          id(total_S1).publish_state(id(pulses_S1));
+          id(daily_sensor_S1).publish_state(id(daily_S1));
+          id(weekly_sensor_S1).publish_state(id(weekly_S1));
+          id(monthly_sensor_S1).publish_state(id(monthly_S1));
+          id(yearly_sensor_S1).publish_state(id(yearly_S1));
+          id(current_S1).publish_state(id(event_qty_S1));
+
+  - id: publish_states_S2
+    then:
+      - lambda: |-
+          id(total_S2).publish_state(id(pulses_S2));
+          id(daily_sensor_S2).publish_state(id(daily_S2));
+          id(weekly_sensor_S2).publish_state(id(weekly_S2));
+          id(monthly_sensor_S2).publish_state(id(monthly_S2));
+          id(yearly_sensor_S2).publish_state(id(yearly_S2));
+          id(current_S2).publish_state(id(event_qty_S2));
+
+  - id: publish_states_S3
+    then:
+      - lambda: |-
+          id(total_S3).publish_state(id(pulses_S3));
+          id(daily_sensor_S3).publish_state(id(daily_S3));
+          id(weekly_sensor_S3).publish_state(id(weekly_S3));
+          id(monthly_sensor_S3).publish_state(id(monthly_S3));
+          id(yearly_sensor_S3).publish_state(id(yearly_S3));
+          id(current_S3).publish_state(id(event_qty_S3));
+
+time:
+  - platform: sntp
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        then:
+          - globals.set: {id: daily_S1, value: '0'}
+          - globals.set: {id: daily_S2, value: '0'}
+          - globals.set: {id: daily_S3, value: '0'}
+          - script.execute: publish_states_S1
+          - script.execute: publish_states_S2
+          - script.execute: publish_states_S3
+
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        days_of_week: MON
+        then:
+          - globals.set: {id: weekly_S1, value: '0'}
+          - globals.set: {id: weekly_S2, value: '0'}
+          - globals.set: {id: weekly_S3, value: '0'}
+          - script.execute: publish_states_S1
+          - script.execute: publish_states_S2
+          - script.execute: publish_states_S3
+
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        days_of_month: 1
+        then:
+          - globals.set: {id: monthly_S1, value: '0'}
+          - globals.set: {id: monthly_S2, value: '0'}
+          - globals.set: {id: monthly_S3, value: '0'}
+          - script.execute: publish_states_S1
+          - script.execute: publish_states_S2
+          - script.execute: publish_states_S3
+
+      - seconds: 0
+        minutes: 0
+        hours: 0
+        days_of_month: 1
+        months: JAN
+        then:
+          - globals.set: {id: yearly_S1, value: '0'}
+          - globals.set: {id: yearly_S2, value: '0'}
+          - globals.set: {id: yearly_S3, value: '0'}
+          - script.execute: publish_states_S1
+          - script.execute: publish_states_S2
+          - script.execute: publish_states_S3
+
+
+# BINARY SENSORS
+binary_sensor:
+  - platform: gpio
+    id: bs_S1
+    pin:
+      number: GPIO21
+      mode: INPUT_PULLUP
+    internal: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      - lambda: |
+          id(pulses_S1) += 1;
+          id(daily_S1) += 1;
+          id(weekly_S1) += 1;
+          id(monthly_S1) += 1;
+          id(yearly_S1) += 1;
+          id(event_qty_S1) += 1;
+      - script.execute: publish_states_S1
+
+  - platform: gpio
+    id: bs_S2
+    pin:
+      number: GPIO16
+      mode: INPUT_PULLUP
+    internal: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      - lambda: |-
+          id(pulses_S2) += 1;
+          id(daily_S2) += 1;
+          id(weekly_S2) += 1;
+          id(monthly_S2) += 1;
+          id(yearly_S2) += 1;
+          id(event_qty_S2) += 1;
+      - script.execute: publish_states_S2
+
+  - platform: gpio
+    id: bs_S3
+    pin:
+      number: GPIO17
+      mode: INPUT_PULLUP
+    internal: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      - lambda: |-
+          id(pulses_S3) += 1;
+          id(daily_S3) += 1;
+          id(weekly_S3) += 1;
+          id(monthly_S3) += 1;
+          id(yearly_S3) += 1;
+          id(event_qty_S3) += 1;
+      - script.execute: publish_states_S3
+
+# TEMPLATE SENSORS
+sensor:
+  - platform: uptime
+    name: "${friendly_name} uptime"
+  - platform: template
+    id: total_S1
+    name: "Counter S1 - Total"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: daily_sensor_S1
+    name: "Counter S1 - Daily"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+    device_class: water
+    state_class: total_increasing
+  - platform: template
+    id: weekly_sensor_S1
+    name: "Counter S1 - Weekly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: monthly_sensor_S1
+    name: "Counter S1 - Monthly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: yearly_sensor_S1
+    name: "Counter S1 - Yearly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: current_S1
+    name: "Counter S1 - Current consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: last_S1
+    name: "Counter S1 - Last consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+
+  #  S2 
+  - platform: template
+    id: total_S2
+    name: "Counter S2 - Total"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: daily_sensor_S2
+    name: "Counter S2 - Daily"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+    device_class: water
+    state_class: total_increasing
+  - platform: template
+    id: weekly_sensor_S2
+    name: "Counter S2 - Weekly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: monthly_sensor_S2
+    name: "Counter S2 - Monthly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: yearly_sensor_S2
+    name: "Counter S2 - Yearly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: current_S2
+    name: "Counter S2 - Current consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: last_S2
+    name: "Counter S2 - Last consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+
+  # --- S3 ---
+  - platform: template
+    id: total_S3
+    name: "Counter S3 - Total"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: daily_sensor_S3
+    name: "Counter S3 - Daily"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+    device_class: water
+    state_class: total_increasing
+  - platform: template
+    id: weekly_sensor_S3
+    name: "Counter S3 - Weekly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: monthly_sensor_S3
+    name: "Counter S3 - Monthly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: yearly_sensor_S3
+    name: "Counter S3 - Yearly"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: current_S3
+    name: "Counter S3 - Current consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+  - platform: template
+    id: last_S3
+    name: "Counter S3 - Last consumption"
+    unit_of_measurement: "L"
+    accuracy_decimals: 0
+    icon: "mdi:water"
+
+switch:
+  - platform: restart
+    name: "${friendly_name} Restart"
+  - platform: template
+    name: "Enable Edit Mode"
+    id: enable_edit_mode
+    optimistic: true
+
+
+interval:
+  - interval: 10s
+    then:
+      # S1
+      - lambda: |-
+          if (id(event_qty_S1) != id(current_event_qty_S1)) {
+            id(current_event_qty_S1) = id(event_qty_S1);
+            id(event_counter_S1) = 0;
+          } else {
+            id(event_counter_S1) += 10;
+            if (id(event_counter_S1) >= 60) {
+              id(last_event_qty_S1) = id(event_qty_S1);
+              id(last_S1).publish_state(id(last_event_qty_S1));
+              id(event_qty_S1) = 0;
+              id(current_event_qty_S1) = 0;
+              id(event_counter_S1) = 0;
+            }
+          }
+      # S2
+      - lambda: |-
+          if (id(event_qty_S2) != id(current_event_qty_S2)) {
+            id(current_event_qty_S2) = id(event_qty_S2);
+            id(event_counter_S2) = 0;
+          } else {
+            id(event_counter_S2) += 10;
+            if (id(event_counter_S2) >= 60) {
+              id(last_event_qty_S2) = id(event_qty_S2);
+              id(last_S2).publish_state(id(last_event_qty_S2));
+              id(event_qty_S2) = 0;
+              id(current_event_qty_S2) = 0;
+              id(event_counter_S2) = 0;
+            }
+          }
+      # S3
+      - lambda: |-
+          if (id(event_qty_S3) != id(current_event_qty_S3)) {
+            id(current_event_qty_S3) = id(event_qty_S3);
+            id(event_counter_S3) = 0;
+          } else {
+            id(event_counter_S3) += 10;
+            if (id(event_counter_S3) >= 60) {
+              id(last_event_qty_S3) = id(event_qty_S3);
+              id(last_S3).publish_state(id(last_event_qty_S3));
+              id(event_qty_S3) = 0;
+              id(current_event_qty_S3) = 0;
+              id(event_counter_S3) = 0;
+            }
+          }
+
+number:
+  - platform: template
+    name: "Set Total S1"
+    id: set_total_S1
+    min_value: 0
+    max_value: 999999
+    step: 1
+    mode: box
+    set_action:
+      - if:
+          condition:
+            switch.is_on: enable_edit_mode
+          then:
+            - globals.set:
+                id: pulses_S1
+                value: !lambda "return x;"
+  - platform: template
+    name: "Set Total S2"
+    id: set_total_S2
+    min_value: 0
+    max_value: 999999
+    step: 1
+    mode: box
+    set_action:
+      - if:
+          condition:
+            switch.is_on: enable_edit_mode
+          then:
+            - globals.set:
+                id: pulses_S2
+                value: !lambda "return x;"
+  - platform: template
+    name: "Set Total S3"
+    id: set_total_S3
+    min_value: 0
+    max_value: 999999
+    step: 1
+    mode: box
+    set_action:
+      - if:
+          condition:
+            switch.is_on: enable_edit_mode
+          then:
+            - globals.set:
+                id: pulses_S3
+                value: !lambda "return x;"
+          
