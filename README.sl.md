@@ -66,6 +66,19 @@ Spodaj je celotna shema ožičenja, uporabljena v tem projektu:
 ### **S1 – Maddalena DS TRP**
 - Uporablja **REED SWITCH TRP PULSER**
 
+> **Opomba za uporabnike v Sloveniji:**  
+> Ker sem iz Slovenije, sem Maddalena RSTP stikalo pridobil preko slovenskega distributerja za SENSUS – podjetja **ARSS d.o.o.**  
+>  
+> Podjetje se ukvarja z iskanjem rešitev na področju merjenja in digitalizacije porabe vode.  
+> Osebje je bilo zelo prijazno, hitro in odzivno – stikalo sem prejel praktično že naslednji dan.  
+>  
+> Če se soočate z izzivi pri spremljanju porabe vode, jih lahko kontaktirate – morda so podobno težavo že rešili.   
+> Na voljo imajo tudi široko ponudbo senzorjev za različne tipe vodomerov.  
+>  
+> 🔗 Spletna stran: https://arss.si/  
+> 📧 Kontakt: info@arss.si
+
+
 <p align="left">
   <img src="images/Reed-switch-pulse-emitter.png" width="350">
 </p>
@@ -172,14 +185,14 @@ Prikazale se bodo trenutne meritve za vse tri vodomere.
 
 ---
 
-## 🔄 Restart stikalo
+## 🔄 Restart tipka
 
 **Programski restart** je na voljo prek Home Assistanta:
 
 ```yaml
-switch:
+button:
   - platform: restart
-    name: "Water meter Restart"
+    name: "${friendly_name} Restart"
 ```
 ---
 
@@ -205,6 +218,17 @@ Po namestitvi lahko porabo vseh treh vodomerov spremljaš prek vgrajenega **sple
 
 ---
 
+## MQTT podpora (neobvezno)
+
+Projekt podpira MQTT za integracijo z drugimi sistemi (Node-RED, Grafana, ioBroker …).
+
+MQTT ni potreben za uporabo z Home Assistantom (ESPHome API).
+
+👉 Podrobna navodila so v:
+[MQTT_README_SI.md](MQTT/MQTT_README_SI.md)
+
+---
+
 ## 🧰 Odvisnosti
 * **ESPHome** ≥ 2024.6.0  
 * **Home Assistant** (neobvezen, vendar priporočljiv)  
@@ -218,7 +242,6 @@ MIT License
 ---
 
 ## 🚀 Prihodnje izboljšave
-* Podpora za MQTT za integracijo z drugimi sistemi  
 * Izračun pretoka v realnem času  
 * Prilagoditev za različne ESP32 plošče  
 * Opcijski OLED zaslon za lokalni prikaz  

@@ -65,6 +65,16 @@ Below is the complete wiring diagram used in this project:
 ### **S1 – Maddalena DS TRP**
 - Uses **REED SWITCH TRP PULSER**
 
+> **Note for users in Slovenia:**  
+> Since I am based in Slovenia, I obtained the Maddalena RSTP pulse emitter through the official SENSUS distributor **ARSS d.o.o.**  
+>  
+> The company specializes in water-metering solutions and digitalization technologies. Their team was extremely friendly, responsive, and helpful — I had the pulse emitter delivered the very next day.  
+>  
+> If you are facing a new challenge related to water-consumption monitoring, they may already have a suitable solution. They also offer a wide range of sensors and accessories for different types of water meters.  
+>  
+> 🔗 Website: https://arss.si/  
+> 📧 Contact: info@arss.si
+
 <p align="left">
   <img src="images/Reed-switch-pulse-emitter.png" width="350">
 </p>
@@ -172,14 +182,14 @@ You’ll see live readings from all three water meters.
 
 ---
 
-## 🔄 Restart Switch
+## 🔄 Restart Button
 
-A **software restart switch** is available through Home Assistant:
+A **software restart button** is available through Home Assistant:
 
 ```yaml
-switch:
+button:
   - platform: restart
-    name: "Water meter Restart"
+    name: "${friendly_name} Restart"
 ```
 ---
 
@@ -204,6 +214,17 @@ After installation, you can monitor all three water meters through the built‑i
 
 ---
 
+## MQTT Support (optional)
+
+The project supports MQTT for integration with other systems (Node-RED, Grafana, ioBroker …).
+
+MQTT is not required for use with Home Assistant (ESPHome API).
+
+👉 Detailed instructions can be found in:
+[MQTT_README_EN.md](MQTT/MQTT_README_EN.md)
+
+---
+
 ## 🧰 Dependencies
 * **ESPHome** ≥ 2024.6.0  
 * **Home Assistant** (optional, but recommended)  
@@ -216,8 +237,7 @@ MIT License
 
 ---
 
-## 🚀 Future Improvements
-* MQTT support for integration with other systems  
+## 🚀 Future Improvements 
 * Flow rate calculation support  
 * Adaptation for different ESP32 boards  
 * Optional OLED display for local readings  

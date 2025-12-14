@@ -1,0 +1,6 @@
+mqtt:
+  broker: !secret mqtt_broker
+  username: !secret mqtt_user
+  password: !secret mqtt_pass
+  topic_prefix: watermeter
+  discovery: false

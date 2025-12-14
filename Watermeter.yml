@@ -1,9 +1,11 @@
 substitutions:
   name: "watermeter"
   friendly_name: "Water meter"
+  device_description: "Measure your water consumption with reed switches or inductive sensors connected to the ESP32."
 
 esphome:
   name: ${name}
+  comment: '${device_description}'
   on_boot:
     priority: -10  # -100 To happen before the announcement of the statuses
     then:
@@ -44,9 +46,19 @@ ota:
   - platform: web_server
 
 web_server:
-  port: 80
+  id: esphome_web_server
+  version: 3
 
+# ───────────────────────────────────────────
+# MQTT - To enable MQTT, uncomment the following two lines (packages) and follow the instructions on GitHub.
+# ───────────────────────────────────────────
+
+#packages:
+#  mqtt: !include MQTT/mqtt.yaml
+
+# ───────────────────────────────────────────
 # GLOBALS - you can change initial values ​​if you want
+# ───────────────────────────────────────────
 globals:
   # S1
   - id: pulses_S1
@@ -159,7 +171,9 @@ globals:
     restore_value: no
     initial_value: '0'
 
+# ───────────────────────────────────────────
 # SCRIPTS FOR RESET
+# ───────────────────────────────────────────
 script:
   - id: publish_states_S1
     then:
@@ -243,7 +257,9 @@ time:
           - script.execute: publish_states_S3
 
 
+# ───────────────────────────────────────────
 # BINARY SENSORS
+# ───────────────────────────────────────────
 binary_sensor:
   - platform: gpio
     id: bs_S1
@@ -302,7 +318,9 @@ binary_sensor:
           id(event_qty_S3) += 1;
       - script.execute: publish_states_S3
 
+# ───────────────────────────────────────────
 # TEMPLATE SENSORS
+# ───────────────────────────────────────────
 sensor:
   - platform: uptime
     name: "${friendly_name} uptime"
@@ -444,13 +462,14 @@ sensor:
     icon: "mdi:water"
 
 switch:
-  - platform: restart
-    name: "${friendly_name} Restart"
   - platform: template
     name: "Enable Edit Mode"
     id: enable_edit_mode
     optimistic: true
 
+button:
+  - platform: restart
+    name: "${friendly_name} Restart"
 
 interval:
   - interval: 10s
