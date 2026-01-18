@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ESPHome Triple Water Meter</title>
+  <meta charset="UTF-8">
+
+  <title>ESPHome Triple Water Meter – ESP32 PoE Ethernet</title>
+
+  <meta name="description" content="ESPHome Triple Water Meter project for monitoring three water meters using ESP32-S3-POE-ETH with Ethernet and PoE. Fully compatible with Home Assistant.">
+  <meta name="keywords" content="ESPHome, Water Meter, ESP32, PoE, Ethernet, Home Assistant, Water Consumption">
+  <meta name="author" content="Mitja Modic">
+  <meta name="robots" content="index, follow">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ESPHome Triple Water Meter">
+  <meta property="og:description" content="Monitor three water meters using ESP32-S3-POE-ETH with ESPHome and Home Assistant.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mitjamodic.github.io/ESPHome-Triple-Water-Meter/">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JZY4BLS08G"></script>
@@ -13,13 +26,193 @@
     gtag('js', new Date());
     gtag('config', 'G-JZY4BLS08G');
   </script>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #222;
+    }
+    h1, h2, h3 {
+      color: #0a4b78;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+    }
+    ul {
+      margin-left: 20px;
+    }
+    code, pre {
+      background: #f4f4f4;
+      padding: 8px;
+      display: block;
+      overflow-x: auto;
+    }
+    .repo {
+      background: #eef6fb;
+      padding: 15px;
+      border-left: 4px solid #0a4b78;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>ESPHome Triple Water Meter</h1>
-  <p>Repozitorij projekta je na GitHubu.</p>
-  <p><a href="https://github.com/mitjamodic/ESPHome-Triple-Water-Meter">
-    Odpri GitHub projekt
-  </a></p>
+
+<h1>💧 ESPHome Triple Water Meter (ESP32-S3-POE-ETH)</h1>
+
+<p>
+This project provides a complete <strong>ESPHome configuration</strong> for monitoring
+<strong>three independent water meters</strong> using an
+<strong>ESP32-S3-POE-ETH</strong> controller with integrated
+<strong>Ethernet (W5500)</strong> and <strong>Power-over-Ethernet (PoE)</strong>.
+</p>
+
+<p>
+The system integrates seamlessly with <strong>Home Assistant</strong> and also includes
+a built-in <strong>web server</strong> for standalone monitoring.
+</p>
+
+<div class="repo">
+  👉 Source code and documentation:<br>
+  <a href="https://github.com/mitjamodic/ESPHome-Triple-Water-Meter" target="_blank">
+    https://github.com/mitjamodic/ESPHome-Triple-Water-Meter
+  </a>
+</div>
+
+<hr>
+
+<h2>⚡ Key Features</h2>
+<ul>
+  <li>Supports <strong>three separate water meters</strong></li>
+  <li>Designed for <strong>ESP32-S3-POE-ETH</strong> (no Wi-Fi required)</li>
+  <li>Compatible with <strong>reed switches</strong> and <strong>NPN NO inductive sensors</strong></li>
+  <li>Tracks <strong>daily, weekly, monthly, and yearly</strong> consumption</li>
+  <li>Automatic counter resets based on time periods</li>
+  <li>Manual initialization of meter values</li>
+  <li>Built-in web interface</li>
+  <li>Restart switch via Home Assistant</li>
+  <li>Tested for months in real-world conditions</li>
+</ul>
+
+<hr>
+
+<h2>🧠 Hardware Overview</h2>
+
+<h3>Controller</h3>
+<p>
+<strong>ESP32-S3-POE-ETH</strong> with W5500 Ethernet controller and PoE module.
+</p>
+
+<p>
+PoE allows reliable long-distance installation using a single Ethernet cable for both
+power and data — ideal for utility monitoring.
+</p>
+
+<h3>Wiring Diagram</h3>
+<img src="images/ESP32-S3-ETH-details.png" alt="ESP32-S3 Ethernet wiring diagram">
+
+<hr>
+
+<h2>💧 Water Meters and Sensors</h2>
+
+<h3>S1 – Maddalena DS TRP</h3>
+<p>
+Uses a <strong>reed switch TRP pulse emitter</strong> with hardware debounce
+(100 nF capacitor + 10 kΩ pull-up resistor).
+</p>
+
+<img src="images/Reed-switch-pulse-emitter.png" alt="Reed switch pulse emitter">
+
+<h3>S2 &amp; S3 – Sensus 420</h3>
+<p>
+Use <strong>NPN NO inductive sensors (LJ18A3-8-Z/BX-5V)</strong> powered at 5 V and
+configured with internal pull-ups.
+</p>
+
+<pre><code>mode: INPUT_PULLUP</code></pre>
+
+<p>
+Tested for several months with no false triggers.
+</p>
+
+<hr>
+
+<h2>📊 Data Tracking</h2>
+
+<p>
+Each water meter provides:
+</p>
+
+<ul>
+  <li>Total lifetime consumption</li>
+  <li>Daily usage (reset at midnight)</li>
+  <li>Weekly usage (reset Monday)</li>
+  <li>Monthly usage (reset on the 1st)</li>
+  <li>Yearly usage (reset January 1st)</li>
+  <li>Current and last consumption events</li>
+</ul>
+
+<hr>
+
+<h2>🌐 Web Interface</h2>
+
+<p>
+The firmware includes a built-in web server. After connecting to the network, open:
+</p>
+
+<pre><code>http://&lt;device_ip&gt;</code></pre>
+
+<p>
+Live water usage from all three meters is displayed directly in the browser.
+</p>
+
+<hr>
+
+<h2>🛠 Installation</h2>
+
+<h3>Option 1 – ESPHome Builder</h3>
+<p>
+Upload the YAML configuration directly via ESPHome in Home Assistant.
+</p>
+
+<h3>Option 2 – Precompiled Firmware</h3>
+<p>
+Flash the provided <code>.bin</code> file using the official ESPHome Web Installer:
+</p>
+
+<p>
+<a href="https://web.esphome.io/" target="_blank">https://web.esphome.io/</a>
+</p>
+
+<hr>
+
+<h2>📡 MQTT Support</h2>
+<p>
+Optional MQTT support is available for integration with Node-RED, Grafana, ioBroker, and more.
+</p>
+
+<hr>
+
+<h2>⚖️ License</h2>
+<p>
+MIT License
+</p>
+
+<hr>
+
+<h2>🙌 Credits</h2>
+<p>
+Developed and tested by <strong>Mitja Modic</strong>.
+</p>
+
+<p>
+⭐ If you find this project useful, please consider starring it on GitHub!
+</p>
+
 </body>
 </html>
