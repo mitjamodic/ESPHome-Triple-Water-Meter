@@ -46,8 +46,8 @@ ota:
   - platform: web_server
 
 web_server:
-  id: esphome_web_server
-  version: 3
+  port: 80
+
 
 # ───────────────────────────────────────────
 # MQTT - To enable MQTT, uncomment the following two lines (packages) and follow the instructions on GitHub.
